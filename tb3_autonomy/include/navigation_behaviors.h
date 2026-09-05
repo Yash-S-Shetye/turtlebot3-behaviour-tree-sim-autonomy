@@ -20,6 +20,11 @@ public:
   rclcpp_action::Client<NavigateToPose>::SharedPtr action_client_ptr_;
   bool done_flag_;
 
+  // Feedback / stuck-detection tracking
+  rclcpp::Time last_feedback_time_;
+  double distance_remaining_;
+  static constexpr double FEEDBACK_TIMEOUT_SEC = 40.0;  // seconds without feedback = assume stuck
+
   // Method overrides
   BT::NodeStatus onStart() override;
   BT::NodeStatus onRunning() override;
@@ -29,4 +34,7 @@ public:
 
   // Action Client callback
   void nav_to_pose_callback(const GoalHandleNav::WrappedResult &result);
+  void nav_to_pose_feedback_callback(
+            GoalHandleNav::SharedPtr goal_handle,
+            const std::shared_ptr<const NavigateToPose::Feedback> feedback);
 };
